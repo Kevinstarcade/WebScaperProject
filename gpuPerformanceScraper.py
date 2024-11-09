@@ -14,22 +14,17 @@ import requests
 
 # define soup
 url = requests.get("https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html")
-print(url.text)
 soup = BeautifulSoup(url.text, "html.parser")
-gpus = soup.findAll('a', attrs={'data-label':'x'})
-# entries = soup.findAll('td', attrs={'class':'table_body__data'})
 
+tableEntries = soup.findAll("td")
+lastGpu = soup.find("td", string=re.compile("GT 1030"))
+endList = tableEntries.index(lastGpu)
 
+gpuNames = tableEntries[0:endList+1:7]
+gpuFPS = tableEntries[2:endList+8:7]
 
-
-
-
-
-
-# works
-# entries = soup.findAll('td', string=re.compile("fps"))
-
-# for entry in entries:
-#     print(entry.text)
-
-    
+for i in range(len(gpuFPS)):
+    if "fps" in gpuFPS[i].text:
+        print(gpuNames[i].text + ',', gpuFPS[i].text[gpuFPS[i].text.index('(')+1:gpuFPS[i].text.index('f')])
+    else:
+        print(gpuNames[i].text + ',', None)
